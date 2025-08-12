@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { KvAdminController } from './kv-admin.controller';
 import { KvAdminService } from './kv-admin.service';
 import { User } from './entities/user.entity';
+import { ResponseInterceptor } from '@app/common';
 
 @Module({
   imports: [
@@ -33,6 +35,12 @@ import { User } from './entities/user.entity';
     TypeOrmModule.forFeature([User], 'kv_admin'),
   ],
   controllers: [KvAdminController],
-  providers: [KvAdminService],
+  providers: [
+    KvAdminService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
 export class KvAdminModule {}

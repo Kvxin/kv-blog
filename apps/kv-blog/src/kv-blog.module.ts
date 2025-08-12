@@ -1,15 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { KvBlogController } from './kv-blog.controller';
 import { KvBlogService } from './kv-blog.service';
 import { Post } from './entities/post.entity';
+import { PostsModule } from './posts/posts.module';
+import { ResponseInterceptor } from '@app/common';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env.prod', '.env'],
     }),
     TypeOrmModule.forRootAsync({
       name: 'kv-blog',
@@ -29,10 +32,16 @@ import { Post } from './entities/post.entity';
       }),
       inject: [ConfigService],
     }),
-    // 为 Post 实体创建 TypeORM 特性模块
     TypeOrmModule.forFeature([Post], 'kv-blog'),
+    PostsModule,
   ],
   controllers: [KvBlogController],
-  providers: [KvBlogService],
+  providers: [
+    KvBlogService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
-export class KvBlogModule {}
+export class KvBlogModule { }
