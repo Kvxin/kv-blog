@@ -23,5 +23,11 @@ export class Post extends BaseEntity {
   isPublished: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
-  publishedAt: Date;
+  publishedAt?: Date;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  featuredImage: string;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  tags: string;
 } 
